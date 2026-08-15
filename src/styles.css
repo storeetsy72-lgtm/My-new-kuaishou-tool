@@ -158,6 +158,10 @@
   box-shadow: 0 6px 24px -12px color-mix(in oklab, var(--color-brand) 40%, transparent);
 }
 
+@utility mask-horizontal {
+  mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+}
+
 @utility tap {
   transition:
     background-color 180ms ease,
@@ -165,6 +169,19 @@
     color 180ms ease,
     box-shadow 180ms ease,
     transform 180ms ease;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(calc(-50% - 0.5rem)); /* accounting for gap */
+  }
+}
+
+@utility animate-marquee {
+  animation: marquee 35s linear infinite;
 }
 
 /* Embedded in an iframe: never force viewport-height layout. */
