@@ -23,7 +23,6 @@ const ReviewPrompt = lazy(() =>
 );
 
 export const Route = createFileRoute("/")({
-  loader: async (): Promise<ReviewSummary> => fetchReviewSummary(),
   head: () => ({
     meta: [
       { title: "Kuaishou & Kwai Video Downloader - Fast HD, MP3 & Photo Saver" },
@@ -45,7 +44,6 @@ export const Route = createFileRoute("/")({
 });
 
 type TabId = "single" | "batch" | "history";
-
 const TABS: { id: TabId; label: string; short: string }[] = [
   { id: "single", label: "Single Download", short: "Single" },
   { id: "batch", label: "Batch Download", short: "Batch" },
@@ -53,16 +51,24 @@ const TABS: { id: TabId; label: string; short: string }[] = [
 ];
 
 function Index() {
-  const initialSummary = Route.useLoaderData();
   const [tab, setTab] = useState<TabId>("single");
   const [history, setHistory] = useState<HistoryItem[]>([]);
-  const [summary, setSummary] = useState<ReviewSummary>(initialSummary);
+  const [summary, setSummary] = useState<ReviewSummary>({ average: 0, count: 0, recent: [] });
   const [askReview, setAskReview] = useState(false);
+
   const refresh = useCallback(() => setHistory(loadHistory()), []);
 
   useEffect(() => {
     refresh();
   }, [refresh]);
+
+  const reloadReviews = useCallback(() => {
+    void fetchReviewSummary().then(setSummary);
+  }, []);
+
+  useEffect(() => {
+    reloadReviews();
+  }, [reloadReviews]);
 
   useEffect(() => {
     const onDownload = (e: Event) => {
@@ -75,10 +81,6 @@ function Index() {
     };
     window.addEventListener("kvd:download", onDownload);
     return () => window.removeEventListener("kvd:download", onDownload);
-  }, []);
-
-  const reloadReviews = useCallback(() => {
-    void fetchReviewSummary().then(setSummary);
   }, []);
 
   return (
@@ -108,6 +110,7 @@ function Index() {
               </button>
             ))}
           </div>
+
           <div className="mt-3">
             {tab === "single" && <SingleTab onSaved={refresh} />}
             {tab !== "single" && (
@@ -123,8 +126,10 @@ function Index() {
             )}
           </div>
         </div>
+
         <ReviewsSection summary={summary} onChanged={reloadReviews} />
       </div>
+
       {askReview && (
         <Suspense fallback={null}>
           <ReviewPrompt onClose={() => setAskReview(false)} onSubmitted={reloadReviews} />
