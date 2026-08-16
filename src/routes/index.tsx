@@ -27,7 +27,7 @@ const loadReviewsWithTimeout = async (): Promise<ReviewSummary> => {
     return await Promise.race([
       fetchReviewSummary(),
       new Promise<ReviewSummary>((resolve) =>
-        setTimeout(() => resolve({ average: 0, count: 0, recent: [] }), 800),
+        setTimeout(() => resolve({ average: 0, count: 0, recent: [] }), 200),
       ),
     ]);
   } catch {
@@ -75,6 +75,23 @@ function Index() {
   const [askReview, setAskReview] = useState(false);
 
   const refresh = useCallback(() => setHistory(loadHistory()), []);
+
+
+  useEffect(() => {
+    if (window === window.parent) return;
+    
+    const sendHeight = () => {
+      // Adding a small padding just to be safe
+      const height = document.documentElement.scrollHeight + 20;
+      window.parent.postMessage({ type: "kvd:resize", height }, "*");
+    };
+
+    const observer = new ResizeObserver(() => sendHeight());
+    observer.observe(document.body);
+    sendHeight();
+
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     refresh();

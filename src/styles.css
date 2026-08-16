@@ -195,3 +195,5 @@ html.is-embedded #root {
 html.is-embedded .min-h-screen {
   min-height: 0 !important;
 }
+
+html, body { margin: 0; padding: 0; background: transparent !important; }
