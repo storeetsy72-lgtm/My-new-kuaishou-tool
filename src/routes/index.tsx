@@ -80,15 +80,22 @@ function Index() {
   useEffect(() => {
     if (window === window.parent) return;
     
-    const sendHeight = () => {
-      // Adding a small padding just to be safe
-      const height = document.documentElement.scrollHeight + 20;
-      window.parent.postMessage({ type: "kvd:resize", height }, "*");
-    };
+    
 
-    const observer = new ResizeObserver(() => sendHeight());
-    observer.observe(document.body);
-    sendHeight();
+    const observer = new ResizeObserver((entries) => {
+      // Use the actual content height, not the document scroll height to prevent infinite loops
+      const mainEl = document.getElementById("kvd-main-content");
+      if (mainEl) {
+        const height = mainEl.getBoundingClientRect().height;
+        window.parent.postMessage({ type: "kvd:resize", height }, "*");
+      }
+    });
+    const mainEl = document.getElementById("kvd-main-content");
+    if (mainEl) {
+      observer.observe(mainEl);
+      window.parent.postMessage({ type: "kvd:resize", height: mainEl.getBoundingClientRect().height }, "*");
+    }
+    
 
     return () => observer.disconnect();
   }, []);
@@ -119,7 +126,7 @@ function Index() {
   }, []);
 
   return (
-    <main className="w-full bg-background px-3 py-4">
+    <main id="kvd-main-content" className="w-full bg-background px-3 py-4 overflow-hidden">
       <div className="mx-auto w-full max-w-3xl">
         <div className="glass-card rounded-2xl p-3 sm:p-4">
           <div
