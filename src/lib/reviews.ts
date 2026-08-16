@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { createReview, deleteReview, updateReview } from "./reviews.functions";
+
 
 export type Review = {
   id: string;
@@ -34,7 +34,7 @@ const MOCK_REVIEWS: Review[] = [
 
 export async function fetchReviewSummary(): Promise<ReviewSummary> {
   const { data, error } = await supabase
-    .from("reviews")
+    .from("public_reviews")
     .select("id, rating, comment, created_at, updated_at")
     .order("created_at", { ascending: false })
     .limit(200);
@@ -114,7 +114,13 @@ export async function saveMyReview(rating: number, comment?: string | null): Pro
   const mine = getMyReview();
   if (mine) {
     try {
-      await updateReview({ data: { id: mine.id, token: mine.token, rating, comment: clean } });
+      const { error } = await supabase.rpc("update_review_owned", {
+        _id: mine.id,
+        _rating: rating,
+        _comment: clean,
+        _owner_token: mine.token
+      });
+      if (error) throw new Error(error.message);
       const next = { ...mine, rating, comment: clean };
       setMyReview(next);
       return next;
@@ -122,7 +128,14 @@ export async function saveMyReview(rating: number, comment?: string | null): Pro
       setMyReview(null); // stale local record — fall through and create a new one
     }
   }
-  const { id, token } = await createReview({ data: { rating, comment: clean } });
+  const token = crypto.randomUUID() + crypto.randomUUID().slice(0, 8);
+  const { data, error } = await supabase.rpc("create_review", {
+    _rating: rating,
+    _comment: clean,
+    _owner_token: token
+  });
+  if (error) throw new Error(error.message);
+  const id = data as string;
   const next: MyReview = { id, token, rating, comment: clean };
   setMyReview(next);
   return next;
@@ -132,7 +145,11 @@ export async function removeMyReview(): Promise<void> {
   const mine = getMyReview();
   if (!mine) return;
   try {
-    await deleteReview({ data: { id: mine.id, token: mine.token } });
+    const { error } = await supabase.rpc("delete_review_owned", {
+      _id: mine.id,
+      _owner_token: mine.token
+    });
+    if (error) throw new Error(error.message);
   } finally {
     setMyReview(null);
   }

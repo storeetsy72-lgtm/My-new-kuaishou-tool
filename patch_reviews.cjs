@@ -1,28 +1,47 @@
-const fs = require("fs");
-const file = "src/lib/reviews.ts";
-let code = fs.readFileSync(file, "utf8");
+const fs = require('fs');
+let code = fs.readFileSync('src/lib/reviews.ts', 'utf8');
 
-const target = `export async function saveMyReview(rating: number, comment?: string | null): Promise<MyReview> {
-  const clean = comment?.trim() ? comment.trim().slice(0, 300) : null;
-  const mine = getMyReview();`;
+code = code.replace(
+  'import { createReview, deleteReview, updateReview } from "./reviews.functions";',
+  ''
+);
 
-const replacement = `export async function saveMyReview(rating: number, comment?: string | null): Promise<MyReview> {
-  const clean = comment?.trim() ? comment.trim().slice(0, 300) : null;
-  
-  if (rating <= 3) {
-    // Fake the save for poor ratings
-    const fakeId = "mock-" + Date.now();
-    const next: MyReview = { id: fakeId, token: "fake-token", rating, comment: clean };
-    return next;
-  }
+code = code.replace(
+  '.from("reviews")',
+  '.from("public_reviews")'
+);
 
-  const mine = getMyReview();`;
+code = code.replace(
+  /const { id, token } = await createReview.*?token, rating, comment: clean };/s,
+  `const token = crypto.randomUUID() + crypto.randomUUID().slice(0, 8);
+  const { data, error } = await supabase.rpc("create_review", {
+    _rating: rating,
+    _comment: clean,
+    _owner_token: token
+  });
+  if (error) throw new Error(error.message);
+  const id = data as string;
+  const next: MyReview = { id, token, rating, comment: clean };`
+);
 
-code = code.replace(target, replacement);
+code = code.replace(
+  /await updateReview\({ data: { id: mine\.id, token: mine\.token, rating, comment: clean } }\);/s,
+  `const { error } = await supabase.rpc("update_review_owned", {
+        _id: mine.id,
+        _rating: rating,
+        _comment: clean,
+        _owner_token: mine.token
+      });
+      if (error) throw new Error(error.message);`
+);
 
-const targetFetch = `const dbRows = data ? data.filter((r) => r.rating >= 1 && r.rating <= 5) : [];`;
-const replacementFetch = `const dbRows = data ? data.filter((r) => r.rating >= 4 && r.rating <= 5) : [];`;
+code = code.replace(
+  /await deleteReview\({ data: { id: mine\.id, token: mine\.token } }\);/s,
+  `const { error } = await supabase.rpc("delete_review_owned", {
+      _id: mine.id,
+      _owner_token: mine.token
+    });
+    if (error) throw new Error(error.message);`
+);
 
-code = code.replace(targetFetch, replacementFetch);
-
-fs.writeFileSync(file, code);
+fs.writeFileSync('src/lib/reviews.ts', code);
