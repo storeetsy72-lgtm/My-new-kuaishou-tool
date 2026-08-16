@@ -14,7 +14,10 @@ export const Route = createFileRoute("/api/public/fetch-video")({
         try {
           const body = (await request.json()) as { url?: string };
           if (!body?.url || typeof body.url !== "string" || body.url.length > 4000) {
-            return Response.json({ success: false, error: "Invalid url" }, { status: 400, headers: cors });
+            return Response.json(
+              { success: false, error: "Invalid url" },
+              { status: 400, headers: cors },
+            );
           }
           const { fetchVideoInfo } = await import("@/lib/kuaishou-fetch.server");
           const data = await fetchVideoInfo(body.url);

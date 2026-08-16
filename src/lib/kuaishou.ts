@@ -53,7 +53,9 @@ export function buildFilename(title: string | null | undefined, ext: "mp4" | "m4
 /** RFC 5987 safe Content-Disposition value (raw CJK in headers throws ByteString errors). */
 export function contentDisposition(filename: string, fallbackExt: string) {
   const ascii = `${BRAND}-download.${fallbackExt}`;
-  return `attachment; filename="${ascii}"; filename*=UTF-8''${encodeURIComponent(filename)}`;
+  // Strict RFC 5987 encoding for tricky characters like parentheses and apostrophes
+  const encoded = encodeURIComponent(filename).replace(/['()]/g, escape).replace(/\*/g, "%2A");
+  return `attachment; filename="${ascii}"; filename*=UTF-8''${encoded}`;
 }
 
 export type VideoInfo = {

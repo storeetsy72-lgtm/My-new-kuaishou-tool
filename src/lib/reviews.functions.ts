@@ -1,3 +1,4 @@
+import { SPAM_REGEX } from "./reviews";
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
@@ -20,7 +21,11 @@ export const createReview = createServerFn({ method: "POST" })
       .from("reviews")
       .insert({
         rating: data.rating,
-        comment: data.comment?.trim() ? data.comment.trim().slice(0, 300) : null,
+        comment: (() => {
+          const c = data.comment?.trim() ? data.comment.trim().slice(0, 300) : null;
+          if (c && SPAM_REGEX.test(c)) throw new Error("Links are not allowed in reviews.");
+          return c;
+        })(),
         owner_token: token,
       })
       .select("id")
@@ -38,7 +43,11 @@ export const updateReview = createServerFn({ method: "POST" })
       .update(
         {
           rating: data.rating,
-          comment: data.comment?.trim() ? data.comment.trim().slice(0, 300) : null,
+          comment: (() => {
+            const c = data.comment?.trim() ? data.comment.trim().slice(0, 300) : null;
+            if (c && SPAM_REGEX.test(c)) throw new Error("Links are not allowed in reviews.");
+            return c;
+          })(),
           updated_at: new Date().toISOString(),
         },
         { count: "exact" },

@@ -3,7 +3,13 @@ import { Download, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { extractKuaishouUrl, type VideoInfo } from "@/lib/kuaishou";
-import { downloadHref, fetchVideoInfo, saveHistory, triggerDownload, videoKey } from "@/lib/downloader-client";
+import {
+  downloadHref,
+  fetchVideoInfo,
+  saveHistory,
+  triggerDownload,
+  videoKey,
+} from "@/lib/downloader-client";
 
 type Status = "pending" | "fetching" | "ready" | "failed";
 type Row = { url: string; status: Status; info?: VideoInfo; error?: string };
@@ -52,7 +58,11 @@ export function BatchTab({ onSaved }: { onSaved: () => void }) {
         rows={4}
         className="resize-none rounded-xl text-sm"
       />
-      <Button onClick={start} disabled={running || text.trim().length === 0} className="w-full gap-2">
+      <Button
+        onClick={start}
+        disabled={running || text.trim().length === 0}
+        className="w-full gap-2"
+      >
         {running ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
         {running ? "Processing" : "Process links"}
       </Button>
@@ -74,8 +84,7 @@ export function BatchTab({ onSaved }: { onSaved: () => void }) {
                 className="h-8 gap-1"
                 disabled={row.status !== "ready"}
                 onClick={() => {
-                  const href = row.info && downloadHref(row.info, "mp4", "1080p");
-                  if (href && row.info) triggerDownload(href, videoKey(row.info));
+                  if (row.info) triggerDownload(row.info, "mp4", "1080p");
                 }}
               >
                 {row.status === "fetching" ? (

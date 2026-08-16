@@ -45,7 +45,10 @@ export const Route = createFileRoute("/api/public/download-proxy")({
           const cr = upstream.headers.get("content-range");
           if (cr) headers.set("Content-Range", cr);
           headers.set("Accept-Ranges", "bytes");
-          return new Response(upstream.body, { status: upstream.status === 206 ? 206 : 200, headers });
+          return new Response(upstream.body, {
+            status: upstream.status === 206 ? 206 : 200,
+            headers,
+          });
         } catch (e) {
           return new Response(e instanceof Error ? e.message : "Download failed", { status: 400 });
         }

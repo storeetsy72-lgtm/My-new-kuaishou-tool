@@ -116,11 +116,10 @@ No embed codes, no integration instructions, no developer-facing text anywhere i
 
 No login, no signup, no database tables — this is a fully anonymous, stateless tool.
 
-13. Performance Split vendor chunks (react, supabase, radix) via manualChunks in vite.config.ts. Lazy-load the Toaster during idle. Make zero API/auth calls on startup. Optimize for LCP, INP, and CLS. 
+13. Performance Split vendor chunks (react, supabase, radix) via manualChunks in vite.config.ts. Lazy-load the Toaster during idle. Make zero API/auth calls on startup. Optimize for LCP, INP, and CLS.
 
-
-Mian tool related thing which must on the Tool 
-Tool design don't show any uper side or lower side text or logo. and the tool backround white. second  add the history tab on the top row where show "single download" & "Batch Download" third and history where show recent download videos. make sure its fetch kuaishou and kwai video is seconds and them most important user instant in second download videos in their local storage in any quality"360p — MP4 video
+Mian tool related thing which must on the Tool
+Tool design don't show any uper side or lower side text or logo. and the tool backround white. second add the history tab on the top row where show "single download" & "Batch Download" third and history where show recent download videos. make sure its fetch kuaishou and kwai video is seconds and them most important user instant in second download videos in their local storage in any quality"360p — MP4 video
 
 720p HD — MP4 video
 

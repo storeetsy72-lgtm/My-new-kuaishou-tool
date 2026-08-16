@@ -2,9 +2,16 @@ import { useEffect, useState } from "react";
 import { Star, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { getMyReview, saveMyReview } from "@/lib/reviews";
+import { getMyReview, saveMyReview, SPAM_REGEX } from "@/lib/reviews";
+import { toast } from "sonner";
 
-export function ReviewPrompt({ onClose, onSubmitted }: { onClose: () => void; onSubmitted: () => void }) {
+export function ReviewPrompt({
+  onClose,
+  onSubmitted,
+}: {
+  onClose: () => void;
+  onSubmitted: () => void;
+}) {
   const existing = typeof window !== "undefined" ? getMyReview() : null;
   const [rating, setRating] = useState(existing?.rating ?? 0);
   const [hover, setHover] = useState(0);
@@ -36,13 +43,19 @@ export function ReviewPrompt({ onClose, onSubmitted }: { onClose: () => void; on
 
   const sendComment = async () => {
     if (!comment.trim() || saving) return;
+
+    if (SPAM_REGEX.test(comment)) {
+      toast.error("Links are not allowed in reviews.");
+      return;
+    }
+
     setSaving(true);
     try {
       await saveMyReview(rating || 5, comment);
       onSubmitted();
       onClose();
-    } catch {
-      /* ignore */
+    } catch (e: any) {
+      toast.error(e.message || "Could not save review");
     } finally {
       setSaving(false);
     }

@@ -22,7 +22,24 @@ const ReviewPrompt = lazy(() =>
   import("@/components/reviews/ReviewPrompt").then((m) => ({ default: m.ReviewPrompt })),
 );
 
+const loadReviewsWithTimeout = async (): Promise<ReviewSummary> => {
+  try {
+    return await Promise.race([
+      fetchReviewSummary(),
+      new Promise<ReviewSummary>((resolve) =>
+        setTimeout(() => resolve({ average: 0, count: 0, recent: [] }), 800),
+      ),
+    ]);
+  } catch {
+    return { average: 0, count: 0, recent: [] };
+  }
+};
+
 export const Route = createFileRoute("/")({
+  loader: async () => {
+    const summary = await loadReviewsWithTimeout();
+    return { summary };
+  },
   head: () => ({
     meta: [
       { title: "Kuaishou & Kwai Video Downloader - Fast HD, MP3 & Photo Saver" },
@@ -53,7 +70,8 @@ const TABS: { id: TabId; label: string; short: string }[] = [
 function Index() {
   const [tab, setTab] = useState<TabId>("single");
   const [history, setHistory] = useState<HistoryItem[]>([]);
-  const [summary, setSummary] = useState<ReviewSummary>({ average: 0, count: 0, recent: [] });
+  const initialSummary = Route.useLoaderData({ select: (d) => d.summary });
+  const [summary, setSummary] = useState<ReviewSummary>(initialSummary);
   const [askReview, setAskReview] = useState(false);
 
   const refresh = useCallback(() => setHistory(loadHistory()), []);

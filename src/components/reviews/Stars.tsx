@@ -8,7 +8,9 @@ export function Stars({ value, size = 16 }: { value: number; size?: number }) {
           key={i}
           style={{ width: size, height: size }}
           className={
-            i <= Math.round(value) ? "fill-primary text-primary" : "fill-muted text-muted-foreground/40"
+            i <= Math.round(value)
+              ? "fill-primary text-primary"
+              : "fill-muted text-muted-foreground/40"
           }
         />
       ))}

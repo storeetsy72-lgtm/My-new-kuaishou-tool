@@ -11,8 +11,14 @@ export const Route = createFileRoute("/api/public/extract-audio")({
         if (!target) return new Response("Missing url", { status: 400 });
         try {
           const { safeFetch, refererFor } = await import("@/lib/kuaishou-fetch.server");
-          const upstream = await safeFetch(target, { headers: { Referer: refererFor(target) } }, 5, 20000);
-          if (!upstream.ok || !upstream.body) return new Response("Upstream error", { status: 502 });
+          const upstream = await safeFetch(
+            target,
+            { headers: { Referer: refererFor(target) } },
+            5,
+            20000,
+          );
+          if (!upstream.ok || !upstream.body)
+            return new Response("Upstream error", { status: 502 });
           return new Response(upstream.body, {
             status: 200,
             headers: {

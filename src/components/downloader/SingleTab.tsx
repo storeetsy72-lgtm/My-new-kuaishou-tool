@@ -39,8 +39,7 @@ export function SingleTab({ onSaved }: { onSaved: () => void }) {
       saveHistory(data);
       onSaved();
       if (format !== "mp4") {
-        const href = downloadHref(data, format);
-        if (href) triggerDownload(href, videoKey(data));
+        triggerDownload(data, format);
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not fetch this video");
@@ -51,8 +50,7 @@ export function SingleTab({ onSaved }: { onSaved: () => void }) {
 
   const pickQuality = (q: Quality) => {
     if (!info) return;
-    const href = downloadHref(info, "mp4", q);
-    if (href) triggerDownload(href, videoKey(info));
+    triggerDownload(info, "mp4", q);
   };
 
   const reset = () => {

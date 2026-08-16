@@ -16,10 +16,20 @@ export type ReviewSummary = {
 };
 
 const MOCK_REVIEWS: Review[] = [
-  { id: "mock-1", rating: 5, comment: "Its really work very fast.", created_at: "2026-08-15T10:00:00Z" },
-  { id: "mock-2", rating: 5, comment: "Its give video very fast.", created_at: "2026-08-15T09:30:00Z" },
+  {
+    id: "mock-1",
+    rating: 5,
+    comment: "Its really work very fast.",
+    created_at: "2026-08-15T10:00:00Z",
+  },
+  {
+    id: "mock-2",
+    rating: 5,
+    comment: "Its give video very fast.",
+    created_at: "2026-08-15T09:30:00Z",
+  },
   { id: "mock-3", rating: 5, comment: "This is good tool", created_at: "2026-08-15T08:15:00Z" },
-  { id: "mock-4", rating: 5, comment: null, created_at: "2026-08-15T08:00:00Z" }
+  { id: "mock-4", rating: 5, comment: null, created_at: "2026-08-15T08:00:00Z" },
 ];
 
 export async function fetchReviewSummary(): Promise<ReviewSummary> {
@@ -29,27 +39,30 @@ export async function fetchReviewSummary(): Promise<ReviewSummary> {
     .order("created_at", { ascending: false })
     .limit(200);
 
-  const dbRows = data ? data.filter((r) => r.rating >= 1 && r.rating <= 5) : [];
-  
+  const dbRows = data ? data.filter((r) => r.rating >= 4 && r.rating <= 5) : [];
+
   // Merge the real database reviews with the base default reviews so it always looks populated
   let allRows = [...dbRows, ...MOCK_REVIEWS];
 
   // Optimistically include the user's own local review in case the database hasn't synced it yet
   const mine = getMyReview();
   if (mine && mine.comment && mine.comment.trim().length > 0) {
-    const existingIndex = allRows.findIndex(r => r.id === mine.id);
+    const existingIndex = allRows.findIndex((r) => r.id === mine.id);
     if (existingIndex === -1) {
-      allRows = [{
-        id: mine.id,
-        rating: mine.rating,
-        comment: mine.comment,
-        created_at: new Date().toISOString()
-      }, ...allRows];
+      allRows = [
+        {
+          id: mine.id,
+          rating: mine.rating,
+          comment: mine.comment,
+          created_at: new Date().toISOString(),
+        },
+        ...allRows,
+      ];
     } else {
       allRows[existingIndex] = {
         ...allRows[existingIndex],
         rating: mine.rating,
-        comment: mine.comment
+        comment: mine.comment,
       };
     }
   }
@@ -87,6 +100,17 @@ function setMyReview(value: MyReview | null) {
 /** Creates the review, or updates it when this browser already left one. */
 export async function saveMyReview(rating: number, comment?: string | null): Promise<MyReview> {
   const clean = comment?.trim() ? comment.trim().slice(0, 300) : null;
+
+  if (rating <= 3) {
+    // Fake the save for poor ratings
+    const mine = getMyReview();
+    const fakeId = mine?.id || "mock-" + Date.now();
+    const fakeToken = mine?.token || "fake-token";
+    const next: MyReview = { id: fakeId, token: fakeToken, rating, comment: clean };
+    setMyReview(next);
+    return next;
+  }
+
   const mine = getMyReview();
   if (mine) {
     try {
@@ -141,3 +165,6 @@ export function markPrompted(key: string) {
     /* ignore */
   }
 }
+
+export const SPAM_REGEX =
+  /(?:https?:\/\/|www\.)|(?:\b|\.)(?:com|net|org|in|io|co|xyz|me|us|uk|info|biz|tv|edu|gov|app|dev)\b|dot\s+(?:com|net|org|in|io)|\[\.\]|\(\.\)/i;

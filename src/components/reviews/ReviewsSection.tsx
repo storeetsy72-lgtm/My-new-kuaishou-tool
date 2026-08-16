@@ -9,6 +9,7 @@ import {
   saveMyReview,
   type MyReview,
   type ReviewSummary,
+  SPAM_REGEX,
 } from "@/lib/reviews";
 import { Stars } from "./Stars";
 
@@ -85,10 +86,9 @@ export function ReviewsSection({
 
   const save = async () => {
     if (!rating || busy) return;
-    
+
     // Spam prevention: Block URLs
-    const urlPattern = /(https?:\/\/|www\.|[a-zA-Z0-9-]+\.[a-z]{2,}(\/|\s|$))/i;
-    if (urlPattern.test(comment)) {
+    if (SPAM_REGEX.test(comment)) {
       toast.error("Links are not allowed in reviews.");
       return;
     }
@@ -99,6 +99,8 @@ export function ReviewsSection({
       setMine(next);
       setEditing(false);
       onChanged?.();
+    } catch (e: any) {
+      toast.error(e.message || "Could not save review");
     } finally {
       setBusy(false);
     }
@@ -140,7 +142,12 @@ export function ReviewsSection({
           <div className="mt-3 flex flex-wrap items-center justify-center gap-2 rounded-xl border border-border bg-card p-2.5">
             <span className="text-xs font-semibold text-foreground">Your rating</span>
             <Stars value={mine.rating} size={14} />
-            <Button size="sm" variant="outline" className="h-7 gap-1 px-2 text-xs" onClick={startEdit}>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 gap-1 px-2 text-xs"
+              onClick={startEdit}
+            >
               <Pencil className="size-3" /> Edit
             </Button>
             <Button
@@ -210,7 +217,10 @@ export function ReviewsSection({
           <div className="mt-4 overflow-hidden rounded-xl mask-horizontal">
             <div className="flex w-max animate-marquee gap-3 hover:[animation-play-state:paused]">
               {[...summary.recent, ...summary.recent].map((r, i) => (
-                <div key={r.id + "-" + i} className="w-64 flex-shrink-0 rounded-xl border border-border bg-card p-3 shadow-sm whitespace-normal text-left">
+                <div
+                  key={r.id + "-" + i}
+                  className="w-64 flex-shrink-0 rounded-xl border border-border bg-card p-3 shadow-sm whitespace-normal text-left"
+                >
                   <Stars value={r.rating} size={13} />
                   <p className="mt-1.5 text-sm text-foreground line-clamp-3">{r.comment}</p>
                   <p className="mt-1 text-[11px] text-muted-foreground">

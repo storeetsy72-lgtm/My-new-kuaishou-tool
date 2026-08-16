@@ -2,11 +2,18 @@ const fs = require("fs");
 const file = "src/components/reviews/ReviewsSection.tsx";
 let code = fs.readFileSync(file, "utf8");
 
-// 1. Add toast import
+// 1. Add toast and SPAM_REGEX import
 if (!code.includes("import { toast }")) {
   code = code.replace(
     'import { Loader2, Pencil, Trash2, X } from "lucide-react";',
     'import { Loader2, Pencil, Trash2, X } from "lucide-react";\nimport { toast } from "sonner";',
+  );
+}
+
+if (!code.includes("SPAM_REGEX")) {
+  code = code.replace(
+    '  type ReviewSummary,\n} from "@/lib/reviews";',
+    '  type ReviewSummary,\n  SPAM_REGEX\n} from "@/lib/reviews";',
   );
 }
 
@@ -17,9 +24,7 @@ const saveTarget = `  const save = async () => {
 const saveReplacement = `  const save = async () => {
     if (!rating || busy) return;
     
-    // Spam prevention: Block URLs
-    const urlPattern = /(https?:\\/\\/|www\\.|[a-zA-Z0-9-]+\\.[a-z]{2,}(\\/|\\s|$))/i;
-    if (urlPattern.test(comment)) {
+    if (SPAM_REGEX.test(comment)) {
       toast.error("Links are not allowed in reviews.");
       return;
     }

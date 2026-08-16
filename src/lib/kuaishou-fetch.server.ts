@@ -184,7 +184,8 @@ function parse(html: string): VideoInfo | null {
 
 async function attempt(candidate: string): Promise<VideoInfo> {
   const res = await safeFetch(candidate, {}, 5, 6000);
-  if (res.status === 403 || res.status === 429) throw new Error("Temporarily blocked, please try again");
+  if (res.status === 403 || res.status === 429)
+    throw new Error("Temporarily blocked, please try again");
   const html = await res.text();
   if (!html || html.length < 1500) throw new Error("Empty page");
   const info = parse(html);

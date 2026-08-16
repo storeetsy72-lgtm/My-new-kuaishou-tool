@@ -2,13 +2,7 @@ import { Download, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { downloadHref, triggerDownload, videoKey, type HistoryItem } from "@/lib/downloader-client";
 
-export function HistoryTab({
-  items,
-  onClear,
-}: {
-  items: HistoryItem[];
-  onClear: () => void;
-}) {
+export function HistoryTab({ items, onClear }: { items: HistoryItem[]; onClear: () => void }) {
   if (items.length === 0) {
     return (
       <p className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
@@ -50,8 +44,7 @@ export function HistoryTab({
               size="sm"
               className="h-8 gap-1"
               onClick={() => {
-                const href = downloadHref(item, "mp4", "1080p");
-                if (href) triggerDownload(href, videoKey(item));
+                triggerDownload(item, "mp4", "1080p");
               }}
             >
               <Download className="size-3.5" />

@@ -1,6 +1,6 @@
-const fs = require('fs');
-const file = 'src/lib/reviews.ts';
-let code = fs.readFileSync(file, 'utf8');
+const fs = require("fs");
+const file = "src/lib/reviews.ts";
+let code = fs.readFileSync(file, "utf8");
 
 const target = `  // Merge the real database reviews with the base default reviews so it always looks populated
   const allRows = [...dbRows, ...MOCK_REVIEWS];`;
