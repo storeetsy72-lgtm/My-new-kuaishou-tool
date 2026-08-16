@@ -7,7 +7,8 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
-  nitro: {
+  nitro: process.env.VERCEL ? {} : {
+    preset: "node-server",
     output: {
       dir: "dist",
       serverDir: "dist/server",

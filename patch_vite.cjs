@@ -1,16 +1,10 @@
-const fs = require("fs");
-let code = fs.readFileSync("vite.config.ts", "utf8");
+const fs = require('fs');
+let code = fs.readFileSync('vite.config.ts', 'utf8');
 
 code = code.replace(
-  "tanstackStart: {",
-  `nitro: {
-    output: {
-      dir: "dist",
-      serverDir: "dist/server",
-      publicDir: "dist/client"
-    }
-  },
-  tanstackStart: {`,
+  'nitro: {',
+  `nitro: process.env.VERCEL ? {} : {
+    preset: "node-server",`
 );
 
-fs.writeFileSync("vite.config.ts", code);
+fs.writeFileSync('vite.config.ts', code);
