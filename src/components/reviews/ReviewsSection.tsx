@@ -13,10 +13,10 @@ import {
 } from "@/lib/reviews";
 import { Stars } from "./Stars";
 
-const APP_NAME = "Kuaishou & Kwai Video Downloader";
-const APP_URL = "https://kwaivideosaver.lovable.app/";
+const APP_NAME = "Kuaishou Video Downloader";
+const APP_URL = "https://kuaivideosdownloader.com/";
 
-function buildJsonLd(summary: ReviewSummary) {
+export function buildJsonLd(summary: ReviewSummary) {
   const reviews = summary.recent
     .filter((r) => r.comment && r.comment.trim().length > 0)
     .map((r) => ({
@@ -39,10 +39,10 @@ function buildJsonLd(summary: ReviewSummary) {
     name: APP_NAME,
     url: APP_URL,
     description:
-      "Free online tool to download Kuaishou and Kwai videos in HD, extract MP3 audio or save cover photos.",
+      "Free online tool to download Kuaishou and Kwai videos without watermark in HD & 4K quality. No login or app installation required.",
     applicationCategory: "MultimediaApplication",
-    operatingSystem: "Any (web browser)",
-    browserRequirements: "Requires JavaScript",
+    operatingSystem: "Android, iOS, Windows, macOS, Web",
+    browserRequirements: "Requires a modern web browser",
     offers: {
       "@type": "Offer",
       price: "0",

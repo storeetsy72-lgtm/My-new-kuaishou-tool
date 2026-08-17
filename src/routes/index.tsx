@@ -9,7 +9,7 @@ import {
   wasPrompted,
   type ReviewSummary,
 } from "@/lib/reviews";
-import { ReviewsSection } from "@/components/reviews/ReviewsSection";
+import { ReviewsSection, buildJsonLd } from "@/components/reviews/ReviewsSection";
 
 // Only the Single tab ships in the first chunk; the rest loads on demand.
 const BatchTab = lazy(() =>
@@ -111,6 +111,18 @@ function Index() {
   useEffect(() => {
     reloadReviews();
   }, [reloadReviews]);
+
+  useEffect(() => {
+    if (window !== window.parent && summary && summary.count > 0) {
+      try {
+        const schema = buildJsonLd(summary);
+        window.parent.postMessage({ type: "kvd:schema", schema }, "*");
+      } catch (e) {
+        // ignore
+      }
+    }
+  }, [summary]);
+
 
   useEffect(() => {
     const onDownload = (e: Event) => {
