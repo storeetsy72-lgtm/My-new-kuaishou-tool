@@ -33,43 +33,35 @@ const MOCK_REVIEWS: Review[] = [
 ];
 
 export async function fetchReviewSummary(): Promise<ReviewSummary> {
-  const { data, error } = await supabase
-    .from("public_reviews")
-    .select("id, rating, comment, created_at, updated_at")
-    .order("created_at", { ascending: false })
-    .limit(10000);
+  const [ratingsRes, recentRes] = await Promise.all([
+    supabase.from("public_reviews").select("rating").gte("rating", 4),
+    supabase.from("public_reviews").select("id, rating, comment, created_at, updated_at").not("comment", "is", null).order("created_at", { ascending: false }).limit(10)
+  ]);
 
-  const dbRows = data ? data.filter((r) => r.rating >= 4 && r.rating <= 5) : [];
+  const dbRatings = ratingsRes.data || [];
+  const dbRecent = recentRes.data || [];
 
-  // Merge the real database reviews with the base default reviews so it always looks populated
-  let allRows = [...dbRows, ...MOCK_REVIEWS];
+  let allRatings = [...dbRatings.map(r => r.rating), ...MOCK_REVIEWS.map(r => r.rating)];
+  let allRecent = [...dbRecent, ...MOCK_REVIEWS];
 
-  // Optimistically include the user's own local review in case the database hasn't synced it yet
   const mine = getMyReview();
   if (mine && mine.comment && mine.comment.trim().length > 0) {
-    const existingIndex = allRows.findIndex((r) => r.id === mine.id);
+    const existingIndex = allRecent.findIndex((r) => r.id === mine.id);
     if (existingIndex === -1) {
-      allRows = [
-        {
-          id: mine.id,
-          rating: mine.rating,
-          comment: mine.comment,
-          created_at: new Date().toISOString(),
-        },
-        ...allRows,
+      allRecent = [
+        { id: mine.id, rating: mine.rating, comment: mine.comment, created_at: new Date().toISOString() },
+        ...allRecent,
       ];
+      allRatings.push(mine.rating);
     } else {
-      allRows[existingIndex] = {
-        ...allRows[existingIndex],
-        rating: mine.rating,
-        comment: mine.comment,
-      };
+      allRecent[existingIndex] = { ...allRecent[existingIndex], rating: mine.rating, comment: mine.comment };
     }
   }
 
-  const count = allRows.length;
-  const average = count ? allRows.reduce((sum, r) => sum + r.rating, 0) / count : 0;
-  const recent = allRows.filter((r) => r.comment && r.comment.trim().length > 0).slice(0, 6);
+  const count = allRatings.length;
+  const average = count ? allRatings.reduce((sum, r) => sum + r, 0) / count : 0;
+  const recent = allRecent.filter((r) => r.comment && r.comment.trim().length > 0).slice(0, 6);
+
   return { average: Math.round(average * 10) / 10, count, recent };
 }
 

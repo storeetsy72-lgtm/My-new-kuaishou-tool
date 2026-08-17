@@ -22,23 +22,9 @@ const ReviewPrompt = lazy(() =>
   import("@/components/reviews/ReviewPrompt").then((m) => ({ default: m.ReviewPrompt })),
 );
 
-const loadReviewsWithTimeout = async (): Promise<ReviewSummary> => {
-  try {
-    return await Promise.race([
-      fetchReviewSummary(),
-      new Promise<ReviewSummary>((resolve) =>
-        setTimeout(() => resolve({ average: 0, count: 0, recent: [] }), 200),
-      ),
-    ]);
-  } catch {
-    return { average: 0, count: 0, recent: [] };
-  }
-};
-
 export const Route = createFileRoute("/")({
-  loader: async () => {
-    const summary = await loadReviewsWithTimeout();
-    return { summary };
+  loader: () => {
+    return { summary: { average: 0, count: 0, recent: [] } };
   },
   head: () => ({
     meta: [
