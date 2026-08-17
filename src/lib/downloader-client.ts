@@ -54,7 +54,7 @@ export async function triggerDownload(info: VideoInfo, format: Format, quality: 
 
   const href =
     format === "mp3"
-      ? `/api/public/extract-audio?url=${encodeURIComponent(srcUrl)}&filename=${encodeURIComponent(name)}`
+      ? `https://empty-river-2eb7.storeetsy72.workers.dev/?url=${encodeURIComponent(srcUrl)}&type=audio&filename=${encodeURIComponent(name)}`
       : `https://empty-river-2eb7.storeetsy72.workers.dev/?url=${encodeURIComponent(srcUrl)}&type=${format === "jpeg" ? "photo" : "video"}&filename=${encodeURIComponent(name)}`;
 
   const directUrl = format !== "mp3" ? srcUrl : undefined;
@@ -173,7 +173,7 @@ export function downloadHref(
   if (format === "mp3") {
     const src = info.audioUrl || info.videoUrl;
     if (!src) return null;
-    return `/api/public/extract-audio?url=${encodeURIComponent(src)}&filename=${encodeURIComponent(buildFilename(info.title, "m4a"))}`;
+    return `https://empty-river-2eb7.storeetsy72.workers.dev/?url=${encodeURIComponent(src)}&type=audio&filename=${encodeURIComponent(buildFilename(info.title, "m4a"))}`;
   }
   if (format === "jpeg") {
     const src = info.photoUrl || info.thumbnail;
