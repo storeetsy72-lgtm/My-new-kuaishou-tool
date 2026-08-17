@@ -37,7 +37,7 @@ export async function fetchReviewSummary(): Promise<ReviewSummary> {
     .from("public_reviews")
     .select("id, rating, comment, created_at, updated_at")
     .order("created_at", { ascending: false })
-    .limit(200);
+    .limit(10000);
 
   const dbRows = data ? data.filter((r) => r.rating >= 4 && r.rating <= 5) : [];
 
