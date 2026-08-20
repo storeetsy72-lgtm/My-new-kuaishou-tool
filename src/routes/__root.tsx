@@ -106,6 +106,11 @@ function RootShell({ children }: { children: ReactNode }) {
             __html: `(function(){
   if (window.parent === window) return;
   document.documentElement.classList.add('is-embedded');
+  
+  // Make background transparent when embedded
+  document.documentElement.style.backgroundColor = 'transparent';
+  document.body.style.backgroundColor = 'transparent';
+  
   var last = 0;
   function send(){
     var root = document.getElementById('root') || document.body;

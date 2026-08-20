@@ -124,7 +124,7 @@ function Index() {
   }, []);
 
   return (
-    <main id="kvd-main-content" className="w-full bg-background px-3 py-4 overflow-hidden">
+    <main id="kvd-main-content" className="w-full px-3 py-4 overflow-hidden" style={{ backgroundColor: 'transparent' }}>
       <div className="mx-auto w-full max-w-3xl">
         <div className="glass-card rounded-2xl p-3 sm:p-4">
           <div
