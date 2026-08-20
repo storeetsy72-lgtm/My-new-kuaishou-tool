@@ -7,14 +7,14 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
-  nitro: process.env.VERCEL ? {} : {
+  nitro: process.env.VERCEL ? {} : (process.env.NETLIFY ? { preset: "netlify" } : {
     preset: "node-server",
     output: {
       dir: "dist",
       serverDir: "dist/server",
       publicDir: "dist/client",
     },
-  },
+  }),
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
