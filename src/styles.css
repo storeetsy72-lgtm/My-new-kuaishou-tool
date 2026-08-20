@@ -190,10 +190,10 @@ html.is-embedded body,
 html.is-embedded #root {
   min-height: 0 !important;
   height: auto !important;
-  background: #fff;
+  background-color: transparent !important;
 }
 html.is-embedded .min-h-screen {
   min-height: 0 !important;
 }
 
-html, body { margin: 0; padding: 0; background: transparent !important; }
+html, body { margin: 0; padding: 0; background-color: transparent !important; }
