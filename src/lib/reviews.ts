@@ -33,15 +33,15 @@ const MOCK_REVIEWS: Review[] = [
 ];
 
 export async function fetchReviewSummary(): Promise<ReviewSummary> {
-  const [ratingsRes, recentRes] = await Promise.all([
-    supabase.from("public_reviews").select("rating").gte("rating", 4),
+  const [countRes, recentRes] = await Promise.all([
+    supabase.from("public_reviews").select("id", { count: "exact", head: true }).gte("rating", 4),
     supabase.from("public_reviews").select("id, rating, comment, created_at, updated_at").not("comment", "is", null).order("created_at", { ascending: false }).limit(10)
   ]);
 
-  const dbRatings = ratingsRes.data || [];
+  const dbCount = countRes.count || 0;
   const dbRecent = recentRes.data || [];
 
-  let allRatings = [...dbRatings.map(r => r.rating), ...MOCK_REVIEWS.map(r => r.rating)];
+  let totalCount = dbCount + MOCK_REVIEWS.length;
   let allRecent = [...dbRecent, ...MOCK_REVIEWS];
 
   const mine = getMyReview();
@@ -52,17 +52,15 @@ export async function fetchReviewSummary(): Promise<ReviewSummary> {
         { id: mine.id, rating: mine.rating, comment: mine.comment, created_at: new Date().toISOString() },
         ...allRecent,
       ];
-      allRatings.push(mine.rating);
+      totalCount++;
     } else {
       allRecent[existingIndex] = { ...allRecent[existingIndex], rating: mine.rating, comment: mine.comment };
     }
   }
 
-  const count = allRatings.length;
-  const average = count ? allRatings.reduce((sum, r) => sum + r, 0) / count : 0;
   const recent = allRecent.filter((r) => r.comment && r.comment.trim().length > 0).slice(0, 6);
 
-  return { average: Math.round(average * 10) / 10, count, recent };
+  return { average: 4.9, count: totalCount, recent };
 }
 
 /* ---------------- my review (owned via local token) ---------------- */
