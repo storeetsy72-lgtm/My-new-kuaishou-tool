@@ -63,15 +63,12 @@ export function ReviewPrompt({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4"
+      className="fixed bottom-4 right-4 z-50 w-[calc(100%-2rem)] max-w-[320px] animate-in slide-in-from-bottom-5 fade-in duration-300"
       role="dialog"
-      aria-modal="true"
       aria-label="Rate this downloader"
-      onClick={onClose}
     >
       <div
-        className="glass-card w-full max-w-sm rounded-2xl bg-card p-5 text-center"
-        onClick={(e) => e.stopPropagation()}
+        className="glass-card rounded-2xl bg-card p-5 text-center shadow-2xl border border-border"
       >
         <button
           type="button"
