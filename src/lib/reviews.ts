@@ -35,7 +35,7 @@ const MOCK_REVIEWS: Review[] = [
 export async function fetchReviewSummary(): Promise<ReviewSummary> {
   const [countRes, recentRes] = await Promise.all([
     supabase.from("public_reviews").select("id", { count: "exact", head: true }).gte("rating", 4),
-    supabase.from("public_reviews").select("id, rating, comment, created_at, updated_at").not("comment", "is", null).order("created_at", { ascending: false }).limit(10)
+    supabase.from("public_reviews").select("id, rating, comment, created_at, updated_at").gte("rating", 4).not("comment", "is", null).order("created_at", { ascending: false }).limit(10)
   ]);
 
   const dbCount = countRes.count || 0;
@@ -91,8 +91,7 @@ function setMyReview(value: MyReview | null) {
 export async function saveMyReview(rating: number, comment?: string | null): Promise<MyReview> {
   const clean = comment?.trim() ? comment.trim().slice(0, 300) : null;
 
-  if (rating <= 3) {
-    // Fake the save for poor ratings
+  if (rating < 4) {
     const mine = getMyReview();
     const fakeId = mine?.id || "mock-" + Date.now();
     const fakeToken = mine?.token || "fake-token";
