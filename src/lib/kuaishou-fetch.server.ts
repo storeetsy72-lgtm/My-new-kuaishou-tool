@@ -196,11 +196,13 @@ async function attempt(candidate: string): Promise<VideoInfo> {
 export async function fetchVideoInfo(input: string): Promise<VideoInfo> {
   const url = extractKuaishouUrl(input);
   if (!url) throw new Error("No valid Kuaishou or Kwai link found");
+
   const list = candidates(url);
-  // Query every candidate in parallel and return the first one that has a video,
-  // without waiting for the slower mirrors to finish.
   const fallbacks: VideoInfo[] = [];
   let lastError = "Could not fetch video info";
+
+  // Query every candidate in parallel and return the first one that has a video,
+  // without waiting for the slower mirrors to finish. (High speed mode!)
   const all = list.map((c) => attempt(c));
   const first = await new Promise<VideoInfo | null>((resolve) => {
     let pending = all.length;
@@ -218,6 +220,7 @@ export async function fetchVideoInfo(input: string): Promise<VideoInfo> {
       });
     }
   });
+
   if (first) return first;
   if (fallbacks[0]) return fallbacks[0];
   throw new Error(lastError);

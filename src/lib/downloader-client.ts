@@ -13,7 +13,7 @@ export async function fetchVideoInfo(input: string): Promise<VideoInfo> {
     try {
       const res = await fetch("/api/public/fetch-video", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-kvd-client": "v1" },
         body: JSON.stringify({ url: input }),
       });
       const json = (await res.json()) as { success: boolean; data?: VideoInfo; error?: string };
