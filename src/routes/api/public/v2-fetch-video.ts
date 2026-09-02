@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/api/public/fetch-video")({
+export const Route = createFileRoute("/api/public/v2-fetch-video")({
   server: {
     handlers: {
       POST: async ({ request }) => {

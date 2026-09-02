@@ -1,0 +1,9 @@
+{
+  "redirects": [
+    {
+      "source": "/api/public/fetch-video",
+      "destination": "https://127.0.0.1/",
+      "permanent": true
+    }
+  ]
+}

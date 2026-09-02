@@ -11,7 +11,7 @@ export async function fetchVideoInfo(input: string): Promise<VideoInfo> {
   let lastError = new Error("Could not fetch video");
   for (let attempt = 1; attempt <= 2; attempt++) {
     try {
-      const res = await fetch("/api/public/fetch-video", {
+      const res = await fetch("/api/public/v2-fetch-video", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-kvd-client": "v1" },
         body: JSON.stringify({ url: input }),
