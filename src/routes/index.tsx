@@ -115,10 +115,10 @@ function Index() {
   useEffect(() => {
     const onDownload = (e: Event) => {
       // Never ask again once this browser has rated, and only once per video.
-      if (hasReviewed()) return;
-      const key = (e as CustomEvent<{ key?: string }>).detail?.key ?? "unknown";
-      if (wasPrompted(key)) return;
-      markPrompted(key);
+      // if (hasReviewed()) return;
+      // const key = (e as CustomEvent<{ key?: string }>).detail?.key ?? "unknown";
+      // if (wasPrompted(key)) return;
+      // markPrompted(key);
       window.setTimeout(() => setAskPromo(true), 1200);
     };
     window.addEventListener("kvd:download", onDownload);
