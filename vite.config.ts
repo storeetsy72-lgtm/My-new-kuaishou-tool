@@ -7,7 +7,7 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
 export default defineConfig({
-  nitro: process.env.VERCEL ? {} : (process.env.NETLIFY ? { preset: "netlify" } : process.env.CF_PAGES ? { preset: "cloudflare-pages" } : {
+  nitro: process.env.VERCEL ? {} : (process.env.NETLIFY ? { preset: "netlify" } : process.env.CF_PAGES ? { preset: "cloudflare-pages", cloudflare: { pages: { routes: { exclude: ["/assets/*", "/favicon.ico"] } } } } : {
     preset: "node-server",
     output: {
       dir: "dist",
