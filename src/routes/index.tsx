@@ -18,6 +18,7 @@ const BatchTab = lazy(() =>
 const HistoryTab = lazy(() =>
   import("@/components/downloader/HistoryTab").then((m) => ({ default: m.HistoryTab })),
 );
+const GraphicDesignPromo = lazy(() => import("@/components/promos/GraphicDesignPromo").then((m) => ({ default: m.GraphicDesignPromo })));
 const ReviewPrompt = lazy(() =>
   import("@/components/reviews/ReviewPrompt").then((m) => ({ default: m.ReviewPrompt })),
 );
@@ -59,6 +60,7 @@ function Index() {
   const initialSummary = Route.useLoaderData({ select: (d) => d.summary });
   const [summary, setSummary] = useState<ReviewSummary>(initialSummary);
   const [askReview, setAskReview] = useState(false);
+  const [askPromo, setAskPromo] = useState(false);
 
   const refresh = useCallback(() => setHistory(loadHistory()), []);
 
@@ -117,7 +119,7 @@ function Index() {
       const key = (e as CustomEvent<{ key?: string }>).detail?.key ?? "unknown";
       if (wasPrompted(key)) return;
       markPrompted(key);
-      window.setTimeout(() => setAskReview(true), 1200);
+      window.setTimeout(() => setAskPromo(true), 1200);
     };
     window.addEventListener("kvd:download", onDownload);
     return () => window.removeEventListener("kvd:download", onDownload);
@@ -170,7 +172,8 @@ function Index() {
         <ReviewsSection summary={summary} onChanged={reloadReviews} />
       </div>
 
-      {askReview && (
+      {askPromo && <Suspense fallback={null}><GraphicDesignPromo onClose={() => { setAskPromo(false); setTimeout(() => setAskReview(true), 300); }} /></Suspense>}
+      {askReview && !askPromo && (
         <Suspense fallback={null}>
           <ReviewPrompt onClose={() => setAskReview(false)} onSubmitted={reloadReviews} />
         </Suspense>
