@@ -60,7 +60,11 @@ export async function triggerDownload(info: VideoInfo, format: Format, quality: 
   const directUrl = format !== "mp3" ? srcUrl : undefined;
 
   try {
-    window.dispatchEvent(new CustomEvent("kvd:download", { detail: { key } }));
+    setTimeout(() => {
+      try {
+        window.dispatchEvent(new CustomEvent("kvd:download", { detail: { key } }));
+      } catch { /* ignore */ }
+    }, 100);
   } catch {
     /* ignore */
   }
@@ -68,6 +72,8 @@ export async function triggerDownload(info: VideoInfo, format: Format, quality: 
   // If we have a directUrl, try fetching it as a blob with progress.
   if (directUrl) {
     const toastId = toast.loading("Starting download...");
+    // Fire the event right before the direct blob fetch freezes the UI
+    setTimeout(() => { try { window.dispatchEvent(new CustomEvent("kvd:download", { detail: { key } })); } catch {} }, 10);
     try {
       const res = await fetch(directUrl, { mode: "cors" });
       if (!res.ok) throw new Error("CORS fetch failed");
@@ -115,6 +121,9 @@ export async function triggerDownload(info: VideoInfo, format: Format, quality: 
   // Fallback / Proxy behavior (including audio)
   const toastId = toast.loading("Starting download...");
   try {
+    // Ensure the event fires immediately before the proxy download hangs the thread
+    setTimeout(() => { try { window.dispatchEvent(new CustomEvent("kvd:download", { detail: { key } })); } catch {} }, 10);
+    
     const res = await fetch(href);
     if (!res.ok) throw new Error("Fetch failed");
 
