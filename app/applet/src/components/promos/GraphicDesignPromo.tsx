@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { X, Palette, CheckCircle2, MessageCircle, Zap, ShieldCheck, Infinity } from "lucide-react";
+import { useEffect, useState } from "react";
+import { X, Palette, CheckCircle2, MessageCircle, Zap, ShieldCheck, Infinity, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function GraphicDesignPromo({
@@ -7,6 +7,14 @@ export function GraphicDesignPromo({
 }: {
   onClose: () => void;
 }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText("03437893678");
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
@@ -60,15 +68,19 @@ export function GraphicDesignPromo({
                Chat on WhatsApp
              </Button>
              
-             {/* Uncopyable Phone Number */}
-             <div 
-                className="mt-2 flex items-center justify-center select-none"
-                style={{ WebkitUserSelect: 'none', userSelect: 'none' }}
-                onContextMenu={(e) => e.preventDefault()}
-             >
-               <p className="text-[13px] font-black tracking-wide text-foreground/90 pointer-events-none">
+             {/* Copyable Phone Number */}
+             <div className="mt-2 flex items-center justify-center gap-1.5">
+               <p className="text-[13px] font-black tracking-wide text-foreground/90">
                   0343 789 3678
                </p>
+               <button
+                 type="button"
+                 onClick={handleCopy}
+                 className="tap flex items-center justify-center rounded-md p-1.5 hover:bg-black/5 dark:hover:bg-white/10 text-muted-foreground hover:text-foreground transition-colors"
+                 aria-label="Copy phone number"
+               >
+                 {copied ? <Check className="size-3.5 text-green-500" /> : <Copy className="size-3.5" />}
+               </button>
              </div>
           </div>
           
