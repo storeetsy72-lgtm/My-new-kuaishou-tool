@@ -62,7 +62,7 @@ export function GraphicDesignPromo({
              <p className="text-[13px] font-bold mb-2 text-foreground">Have a Custom Design in Mind?</p>
              <Button 
                className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white flex gap-2 rounded-xl h-10 font-bold shadow-sm"
-               onClick={() => window.open("https://wa.me/03437893678", "_blank")}
+               onClick={() => window.open("https://wa.me/03437893678", "_blank", "noopener,noreferrer")}
              >
                <MessageCircle className="size-4" />
                Chat on WhatsApp
