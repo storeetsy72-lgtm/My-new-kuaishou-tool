@@ -1,10 +1,10 @@
 const fs = require('fs');
-let code = fs.readFileSync('vite.config.ts', 'utf8');
+const file = 'vite.config.ts';
+let content = fs.readFileSync(file, 'utf8');
 
-code = code.replace(
-  'nitro: {',
-  `nitro: process.env.VERCEL ? {} : {
-    preset: "node-server",`
+content = content.replace(
+  'process.env.NETLIFY ? { preset: "netlify" } : {',
+  'process.env.NETLIFY ? { preset: "netlify" } : process.env.CF_PAGES ? { preset: "cloudflare-pages" } : {'
 );
 
-fs.writeFileSync('vite.config.ts', code);
+fs.writeFileSync(file, content);
