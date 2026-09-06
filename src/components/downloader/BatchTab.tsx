@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Download, Loader2 } from "lucide-react";
+import { Download, Loader2, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { extractKuaishouUrl, type VideoInfo } from "@/lib/kuaishou";
@@ -10,6 +10,7 @@ import {
   triggerDownload,
   videoKey,
 } from "@/lib/downloader-client";
+import { QualityCards } from "./QualityCards";
 
 type Status = "pending" | "fetching" | "ready" | "failed";
 type Row = { url: string; status: Status; info?: VideoInfo; error?: string };
@@ -18,8 +19,10 @@ export function BatchTab({ onSaved }: { onSaved: () => void }) {
   const [text, setText] = useState("");
   const [rows, setRows] = useState<Row[]>([]);
   const [running, setRunning] = useState(false);
+  const [expandedRow, setExpandedRow] = useState<number | null>(null);
 
   const start = async () => {
+    setExpandedRow(null);
     const urls = text
       .split(/\r?\n/)
       .map((line) => extractKuaishouUrl(line))
@@ -67,32 +70,45 @@ export function BatchTab({ onSaved }: { onSaved: () => void }) {
         {running ? "Processing" : "Process links"}
       </Button>
       {rows.length > 0 && (
-        <ul className="max-h-56 space-y-2 overflow-y-auto pr-1">
+        <ul className="max-h-[400px] space-y-2 overflow-y-auto pr-1">
           {rows.map((row, i) => (
             <li
               key={`${row.url}-${i}`}
-              className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl border border-border bg-card p-2"
+              className={`flex flex-col gap-2 rounded-xl border border-border bg-card p-2 transition-colors ${expandedRow === i ? "border-primary/30 bg-primary/5" : ""}`}
             >
-              <div className="min-w-0">
-                <p className="truncate text-sm text-foreground">{row.info?.title || row.url}</p>
-                <p className="truncate text-[11px] text-muted-foreground capitalize">
-                  {row.error ?? row.status}
-                </p>
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+                <div className="min-w-0">
+                  <p className="truncate text-sm text-foreground">{row.info?.title || row.url}</p>
+                  <p className="truncate text-[11px] text-muted-foreground capitalize">
+                    {row.error ?? row.status}
+                  </p>
+                </div>
+                <Button
+                  size="sm"
+                  className="h-8 gap-1"
+                  variant={expandedRow === i ? "secondary" : "default"}
+                  disabled={row.status !== "ready"}
+                  onClick={() => {
+                    setExpandedRow(expandedRow === i ? null : i);
+                  }}
+                >
+                  {row.status === "fetching" ? (
+                    <Loader2 className="size-3.5 animate-spin" />
+                  ) : expandedRow === i ? (
+                    <ChevronUp className="size-3.5" />
+                  ) : (
+                    <Download className="size-3.5" />
+                  )}
+                  {expandedRow === i ? "Close" : "Download"}
+                </Button>
               </div>
-              <Button
-                size="sm"
-                className="h-8 gap-1"
-                disabled={row.status !== "ready"}
-                onClick={() => {
-                  if (row.info) triggerDownload(row.info, "mp4", "1080p");
-                }}
-              >
-                {row.status === "fetching" ? (
-                  <Loader2 className="size-3.5 animate-spin" />
-                ) : (
-                  <Download className="size-3.5" />
-                )}
-              </Button>
+              {expandedRow === i && row.info && (
+                <div className="animate-in slide-in-from-top-2 fade-in pt-1 pb-1">
+                  <QualityCards onPick={(q) => {
+                    triggerDownload(row.info!, "mp4", q);
+                  }} />
+                </div>
+              )}
             </li>
           ))}
         </ul>
