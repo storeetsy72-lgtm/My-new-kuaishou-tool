@@ -114,12 +114,13 @@ function Index() {
 
   useEffect(() => {
     const onDownload = (e: Event) => {
-      // Never ask again once this browser has rated, and only once per video.
-      if (hasReviewed()) return;
-      const key = (e as CustomEvent<{ key?: string }>).detail?.key ?? "unknown";
-      if (wasPrompted(key)) return;
-      markPrompted(key);
-      window.setTimeout(() => setAskPromo(true), 1200);
+      // Always show the promo on every download.
+      if ((window as any)._promoTimeout) {
+        clearTimeout((window as any)._promoTimeout);
+      }
+      (window as any)._promoTimeout = window.setTimeout(() => {
+        setAskPromo(true);
+      }, 1200);
     };
     window.addEventListener("kvd:download", onDownload);
     return () => window.removeEventListener("kvd:download", onDownload);
@@ -172,7 +173,18 @@ function Index() {
         <ReviewsSection summary={summary} onChanged={reloadReviews} />
       </div>
 
-      {askPromo && <Suspense fallback={null}><GraphicDesignPromo onClose={() => { setAskPromo(false); setTimeout(() => setAskReview(true), 300); }} /></Suspense>}
+      {askPromo && (
+        <Suspense fallback={null}>
+          <GraphicDesignPromo 
+            onClose={() => { 
+              setAskPromo(false); 
+              if (!hasReviewed()) {
+                setTimeout(() => setAskReview(true), 300); 
+              }
+            }} 
+          />
+        </Suspense>
+      )}
       {askReview && !askPromo && (
         <Suspense fallback={null}>
           <ReviewPrompt onClose={() => setAskReview(false)} onSubmitted={reloadReviews} />
