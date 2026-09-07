@@ -27,9 +27,10 @@ export const Route = createFileRoute("/api/public/download-proxy")({
           headers.set("Access-Control-Allow-Origin", "*");
           
           const encodedFilename = encodeURIComponent(filename).replace(/['()]/g, escape).replace(/\*/g, "%2A");
+          // Use ASCII fallback for standard filename="" to prevent header byte errors
           headers.set(
             "Content-Disposition",
-            `attachment; filename="${filename}"; filename*=UTF-8''${encodedFilename}`
+            `attachment; filename="kuaivideosdownloader-download"; filename*=UTF-8''${encodedFilename}`
           );
 
           return new Response(response.body, {
