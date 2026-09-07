@@ -54,8 +54,8 @@ export async function triggerDownload(info: VideoInfo, format: Format, quality: 
 
   const href =
     format === "mp3"
-      ? `https://empty-river-2eb7.storeetsy72.workers.dev/?url=${encodeURIComponent(srcUrl)}&type=audio&filename=${encodeURIComponent(name)}`
-      : `https://empty-river-2eb7.storeetsy72.workers.dev/?url=${encodeURIComponent(srcUrl)}&type=${format === "jpeg" ? "photo" : "video"}&filename=${encodeURIComponent(name)}`;
+      ? `/api/public/download-proxy?url=${encodeURIComponent(srcUrl)}&type=audio&filename=${encodeURIComponent(name)}`
+      : `/api/public/download-proxy?url=${encodeURIComponent(srcUrl)}&type=${format === "jpeg" ? "photo" : "video"}&filename=${encodeURIComponent(name)}`;
 
   const directUrl = format !== "mp3" ? srcUrl : undefined;
 
@@ -182,16 +182,16 @@ export function downloadHref(
   if (format === "mp3") {
     const src = info.audioUrl || info.videoUrl;
     if (!src) return null;
-    return `https://empty-river-2eb7.storeetsy72.workers.dev/?url=${encodeURIComponent(src)}&type=audio&filename=${encodeURIComponent(buildFilename(info.title, "m4a"))}`;
+    return `/api/public/download-proxy?url=${encodeURIComponent(src)}&type=audio&filename=${encodeURIComponent(buildFilename(info.title, "m4a"))}`;
   }
   if (format === "jpeg") {
     const src = info.photoUrl || info.thumbnail;
     if (!src) return null;
-    return `https://empty-river-2eb7.storeetsy72.workers.dev/?url=${encodeURIComponent(src)}&type=photo&filename=${encodeURIComponent(buildFilename(info.title, "jpg"))}`;
+    return `/api/public/download-proxy?url=${encodeURIComponent(src)}&type=photo&filename=${encodeURIComponent(buildFilename(info.title, "jpg"))}`;
   }
   if (!info.videoUrl) return null;
   const name = buildFilename(info.title ? `${info.title}-${quality}` : null, "mp4");
-  return `https://empty-river-2eb7.storeetsy72.workers.dev/?url=${encodeURIComponent(info.videoUrl)}&type=video&filename=${encodeURIComponent(name)}`;
+  return `/api/public/download-proxy?url=${encodeURIComponent(info.videoUrl)}&type=video&filename=${encodeURIComponent(name)}`;
 }
 
 export type HistoryItem = VideoInfo & { timestamp: number };
